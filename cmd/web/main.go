@@ -1,18 +1,21 @@
 package main
 
 import (
-	"database/sql" 
+	"database/sql"
 	"flag"
+	_ "github.com/go-sql-driver/mysql"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"snippetbox.mmdmr.net/internal/models"
-	_ "github.com/go-sql-driver/mysql" 
-	)
+)
+
 type application struct {
-	errorLog *log.Logger
-	infoLog  *log.Logger
-	snippets *models.SnippetModel
+	errorLog      *log.Logger
+	infoLog       *log.Logger
+	snippets      *models.SnippetModel
+	templateCache map[string]*template.Template
 }
 
 func main() {
@@ -23,17 +26,23 @@ func main() {
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
-	db, err := openDB(*dsn)  
+	db, err := openDB(*dsn)
 	if err != nil {
 		errorLog.Fatal(err)
 	}
 
 	defer db.Close()
 
+	templateCache, err := newTemplateCache()
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
 		snippets: &models.SnippetModel{DB: db},
+		templateCache: templateCache,
 	}
 
 	srv := &http.Server{
@@ -50,10 +59,10 @@ func main() {
 func openDB(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
-	return nil, err
+		return nil, err
 	}
 	if err = db.Ping(); err != nil {
-	return nil, err
+		return nil, err
 	}
 	return db, nil
-	}
+}

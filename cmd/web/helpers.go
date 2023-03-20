@@ -56,10 +56,11 @@ func (app *application) render(w http.ResponseWriter, status int, page string, d
 func (app *application) newTemplateData(r *http.Request) *templateData {
 	return &templateData{
 		CurrentYear: time.Now().Year(),
+		Flash: app.sessionManager.PopString(r.Context(), "flash"),
 	}
 }
 
-// Create a new decodePostForm() helper method. The second parameter here, dst,
+// The second parameter here, dst,
 // is the target destination that we want to decode the form data into.
 func (app *application) decodePostForm(r *http.Request, dst any) error {
 

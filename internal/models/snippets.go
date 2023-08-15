@@ -6,6 +6,12 @@ import (
 	"time"
 )
 
+type SnippetModelInterface interface {
+	Insert(title string, content string, expires int) (int, error)
+	Get(id int) (*Snippet, error)
+	Latest() ([]*Snippet, error)
+}
+
 type Snippet struct {
 	ID      int
 	Title   string
@@ -66,7 +72,7 @@ func (m *SnippetModel) Latest() ([]*Snippet, error) {
 
 	rows, err := m.DB.Query(stmt)
 	if err != nil {
-	return nil, err
+		return nil, err
 	}
 
 	defer rows.Close()
@@ -74,18 +80,17 @@ func (m *SnippetModel) Latest() ([]*Snippet, error) {
 	snippets := []*Snippet{}
 
 	for rows.Next() {
-	s := &Snippet{}
+		s := &Snippet{}
 
-	err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
-	if err != nil {
-	return nil, err
+		err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
+		if err != nil {
+			return nil, err
+		}
+		snippets = append(snippets, s)
 	}
-	snippets = append(snippets, s)
-	}
-	// When the rows.Next() loop has finished we call rows.Err() to retrieve any
-	// error that was encountered during the iteration.
+
 	if err = rows.Err(); err != nil {
-	return nil, err
+		return nil, err
 	}
 	return snippets, nil
-	}
+}

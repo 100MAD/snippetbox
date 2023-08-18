@@ -73,9 +73,9 @@ func TestSnippetView(t *testing.T) {
 // 	_, _, body := ts.get(t, "/user/signup")
 // 	validCSRFToken := extractCSRFToken(t, body)
 // 	const (
-// 		validName     = "Bob"
-// 		validPassword = "validPa$$word"
-// 		validEmail    = "bob@example.com"
+// 		validName     = "test"
+// 		validPassword = "testtest"
+// 		validEmail    = "test@gmail.com"
 // 		formTag       = "<form action='/user/signup' method='POST' novalidate>"
 // 	)
 // 	tests := []struct {

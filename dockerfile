@@ -1,4 +1,5 @@
 # ------------------------------------------- Builder
+
 FROM golang:alpine AS builder
 
 RUN apk add git
@@ -14,9 +15,10 @@ COPY . .
 RUN go build -o /entrypoint
 
 # ------------------------------------------- Runtime
+
 FROM alpine:latest AS runtime
 
-LABEL maintainer="Mohammad Nasr <mohammadne.dev@gmail.com>"
+LABEL maintainer="mmdmr <m.mortezapour81@gmail.com>"
 
 WORKDIR /app
 
